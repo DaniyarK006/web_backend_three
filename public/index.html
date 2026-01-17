@@ -1,0 +1,519 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Real-time blogging</title>
+    <style>
+        :root {
+            --primary: #007AFF;
+            --secondary: #5856D6;
+            --success: #34C759;
+            --danger: #FF3B30;
+            --text-primary: #000000;
+            --text-secondary: #6e6e73;
+            --bg-primary: #ffffff;
+            --bg-secondary: #f5f5f7;
+            --border: #d2d2d7;
+            --shadow: rgba(0, 0, 0, 0.05);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+            background: var(--bg-secondary);
+            color: var(--text-primary);
+            line-height: 1.5;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 60px 20px;
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 60px;
+        }
+
+        h1 {
+            font-size: 48px;
+            font-weight: 700;
+            letter-spacing: -0.5px;
+            margin-bottom: 12px;
+        }
+
+        .subtitle {
+            font-size: 21px;
+            color: var(--text-secondary);
+            font-weight: 400;
+        }
+
+        .grid {
+            display: grid;
+            grid-template-columns: 400px 1fr;
+            gap: 30px;
+            margin-bottom: 40px;
+        }
+
+        .card {
+            background: var(--bg-primary);
+            border-radius: 18px;
+            padding: 32px;
+            box-shadow: 0 2px 16px var(--shadow);
+        }
+
+        .card-title {
+            font-size: 24px;
+            font-weight: 600;
+            margin-bottom: 24px;
+            letter-spacing: -0.3px;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        label {
+            display: block;
+            font-size: 14px;
+            font-weight: 500;
+            color: var(--text-secondary);
+            margin-bottom: 8px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        input, textarea {
+            width: 100%;
+            padding: 14px 16px;
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            font-size: 16px;
+            font-family: inherit;
+            transition: all 0.2s ease;
+            background: var(--bg-primary);
+        }
+
+        input:focus, textarea:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 4px rgba(0, 122, 255, 0.1);
+        }
+
+        textarea {
+            resize: vertical;
+            min-height: 120px;
+        }
+
+        button {
+            width: 100%;
+            padding: 14px;
+            background: var(--primary);
+            color: white;
+            border: none;
+            border-radius: 10px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            margin-top: 8px;
+        }
+
+        button:hover {
+            background: #0051D5;
+            transform: translateY(-1px);
+        }
+
+        button:active {
+            transform: translateY(0);
+        }
+
+        .btn-secondary {
+            background: var(--bg-secondary);
+            color: var(--text-primary);
+        }
+
+        .btn-secondary:hover {
+            background: #e8e8ed;
+        }
+
+        .blog-item {
+            background: var(--bg-primary);
+            border-radius: 16px;
+            padding: 28px;
+            margin-bottom: 16px;
+            transition: all 0.2s ease;
+            cursor: pointer;
+            border: 1px solid transparent;
+        }
+
+        .blog-item:hover {
+            border-color: var(--border);
+            box-shadow: 0 4px 20px var(--shadow);
+            transform: translateY(-2px);
+        }
+
+        .blog-title {
+            font-size: 22px;
+            font-weight: 600;
+            margin-bottom: 8px;
+            letter-spacing: -0.3px;
+        }
+
+        .blog-meta {
+            display: flex;
+            gap: 20px;
+            font-size: 14px;
+            color: var(--text-secondary);
+            margin-bottom: 16px;
+        }
+
+        .blog-body {
+            color: var(--text-primary);
+            line-height: 1.6;
+            margin-bottom: 20px;
+            font-size: 16px;
+        }
+
+        .blog-actions {
+            display: flex;
+            gap: 8px;
+        }
+
+        .btn-small {
+            padding: 8px 16px;
+            font-size: 14px;
+            width: auto;
+            margin: 0;
+            border-radius: 8px;
+        }
+
+        .btn-edit {
+            background: var(--secondary);
+        }
+
+        .btn-edit:hover {
+            background: #4947CC;
+        }
+
+        .btn-delete {
+            background: var(--danger);
+        }
+
+        .btn-delete:hover {
+            background: #D70015;
+        }
+
+        .btn-like {
+            background: var(--success);
+        }
+
+        .btn-like:hover {
+            background: #28A745;
+        }
+
+        .stats {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 16px;
+            margin-top: 24px;
+        }
+
+        .stat-card {
+            background: var(--bg-secondary);
+            padding: 20px;
+            border-radius: 12px;
+            text-align: center;
+        }
+
+        .stat-value {
+            font-size: 36px;
+            font-weight: 700;
+            color: var(--primary);
+            margin-bottom: 4px;
+        }
+
+        .stat-label {
+            font-size: 13px;
+            color: var(--text-secondary);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .loading {
+            text-align: center;
+            padding: 60px 20px;
+            color: var(--text-secondary);
+            font-size: 18px;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 80px 20px;
+            color: var(--text-secondary);
+        }
+
+        .empty-state h3 {
+            font-size: 24px;
+            margin-bottom: 12px;
+            color: var(--text-primary);
+        }
+
+        .notification {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: var(--bg-primary);
+            padding: 16px 24px;
+            border-radius: 12px;
+            box-shadow: 0 4px 24px rgba(0, 0, 0, 0.15);
+            transform: translateX(400px);
+            transition: transform 0.3s ease;
+            z-index: 1000;
+            border-left: 4px solid var(--primary);
+        }
+
+        .notification.show {
+            transform: translateX(0);
+        }
+
+        .notification.success { border-left-color: var(--success); }
+        .notification.error { border-left-color: var(--danger); }
+
+        @media (max-width: 968px) {
+            .grid {
+                grid-template-columns: 1fr;
+            }
+            
+            h1 {
+                font-size: 36px;
+            }
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .blog-item {
+            animation: fadeIn 0.3s ease;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>Real-time blogging</h1>
+            <p class="subtitle">Create/ Read/ Update/ Delete</p>
+        </header>
+
+        <div class="grid">
+            <div class="card">
+                <h2 class="card-title">New Post</h2>
+                <form id="blogForm">
+                    <div class="form-group">
+                        <label>Title</label>
+                        <input type="text" id="title" placeholder="Enter title" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Content</label>
+                        <textarea id="body" placeholder="Write your story" required></textarea>
+                    </div>
+                    <div class="form-group">
+                        <label>Author</label>
+                        <input type="text" id="author" placeholder="Anonymous">
+                    </div>
+                    <button type="submit" id="submitBtn">Publish</button>
+                    <button type="button" id="cancelBtn" class="btn-secondary" style="display:none;">Cancel</button>
+                </form>
+
+                <div class="stats">
+                    <div class="stat-card">
+                        <div class="stat-value" id="totalPosts">0</div>
+                        <div class="stat-label">Posts</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-value" id="totalViews">0</div>
+                        <div class="stat-label">Views</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card">
+                <h2 class="card-title">Recent Posts</h2>
+                <div id="blogList">
+                    <div class="loading">Loading posts...</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="notification" class="notification"></div>
+
+    <script>
+        const API_URL = '/api';
+        let editingId = null;
+
+        function showNotification(message, type = 'success') {
+            const notif = document.getElementById('notification');
+            notif.textContent = message;
+            notif.className = `notification ${type} show`;
+            setTimeout(() => notif.classList.remove('show'), 3000);
+        }
+
+        async function loadBlogs() {
+            try {
+                const res = await fetch(`${API_URL}/blogs`);
+                const data = await res.json();
+                
+                const blogList = document.getElementById('blogList');
+                
+                if (data.data.length === 0) {
+                    blogList.innerHTML = `
+                        <div class="empty-state">
+                            <h3>No posts yet</h3>
+                            <p>Start by creating your first post</p>
+                        </div>
+                    `;
+                    return;
+                }
+
+                blogList.innerHTML = data.data.map(blog => `
+                    <div class="blog-item" data-id="${blog._id}">
+                        <div class="blog-title">${blog.title}</div>
+                        <div class="blog-meta">
+                            <span>By ${blog.author}</span>
+                            <span>${blog.views} views</span>
+                            <span>${blog.likes} likes</span>
+                        </div>
+                        <div class="blog-body">${blog.body.substring(0, 200)}...</div>
+                        <div class="blog-actions">
+                            <button class="btn-small btn-like" onclick="likeBlog('${blog._id}')">Like</button>
+                            <button class="btn-small btn-edit" onclick="editBlog('${blog._id}')">Edit</button>
+                            <button class="btn-small btn-delete" onclick="deleteBlog('${blog._id}')">Delete</button>
+                        </div>
+                    </div>
+                `).join('');
+
+                updateStats(data);
+            } catch (error) {
+                showNotification('Failed to load posts', 'error');
+            }
+        }
+
+        function updateStats(data) {
+            document.getElementById('totalPosts').textContent = data.count;
+            const totalViews = data.data.reduce((sum, blog) => sum + blog.views, 0);
+            document.getElementById('totalViews').textContent = totalViews;
+        }
+
+        document.getElementById('blogForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            const blogData = {
+                title: document.getElementById('title').value,
+                body: document.getElementById('body').value,
+                author: document.getElementById('author').value || 'Anonymous'
+            };
+
+            try {
+                let res;
+                if (editingId) {
+                    res = await fetch(`${API_URL}/blogs/${editingId}`, {
+                        method: 'PUT',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify(blogData)
+                    });
+                    showNotification('Post updated');
+                } else {
+                    res = await fetch(`${API_URL}/blogs`, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify(blogData)
+                    });
+                    showNotification('Post published');
+                }
+
+                if (res.ok) {
+                    document.getElementById('blogForm').reset();
+                    editingId = null;
+                    document.getElementById('submitBtn').textContent = 'Publish';
+                    document.getElementById('cancelBtn').style.display = 'none';
+                    loadBlogs();
+                }
+            } catch (error) {
+                showNotification('Operation failed', 'error');
+            }
+        });
+
+        async function editBlog(id) {
+            try {
+                const res = await fetch(`${API_URL}/blogs/${id}`);
+                const data = await res.json();
+                const blog = data.data;
+
+                document.getElementById('title').value = blog.title;
+                document.getElementById('body').value = blog.body;
+                document.getElementById('author').value = blog.author;
+
+                editingId = id;
+                document.getElementById('submitBtn').textContent = 'Update';
+                document.getElementById('cancelBtn').style.display = 'block';
+                
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+            } catch (error) {
+                showNotification('Failed to load post', 'error');
+            }
+        }
+
+        document.getElementById('cancelBtn').addEventListener('click', () => {
+            document.getElementById('blogForm').reset();
+            editingId = null;
+            document.getElementById('submitBtn').textContent = 'Publish';
+            document.getElementById('cancelBtn').style.display = 'none';
+        });
+
+        async function deleteBlog(id) {
+            if (!confirm('Delete this post?')) return;
+
+            try {
+                const res = await fetch(`${API_URL}/blogs/${id}`, { method: 'DELETE' });
+                if (res.ok) {
+                    showNotification('Post deleted');
+                    loadBlogs();
+                }
+            } catch (error) {
+                showNotification('Failed to delete', 'error');
+            }
+        }
+
+        async function likeBlog(id) {
+            try {
+                const res = await fetch(`${API_URL}/blogs/${id}/like`, { method: 'POST' });
+                if (res.ok) {
+                    showNotification('Liked');
+                    loadBlogs();
+                }
+            } catch (error) {
+                showNotification('Failed to like', 'error');
+            }
+        }
+
+        loadBlogs();
+    </script>
+</body>
+</html>
